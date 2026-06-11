@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome</title>
+  <title>Mantralaya HRMS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -12,40 +13,1252 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f0f4f8;
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .logo h2 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-menu li {
+      margin-bottom: 8px;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 12px 16px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      background: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e7ff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .top-bar h1 {
+      font-size: 1.5rem;
+      color: #1a202c;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e40af;
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: #16a34a;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-warning {
+      background: #ea580c;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #c2410c;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-secondary {
+      background: #64748b;
+      color: white;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-header h2 {
+      font-size: 1.8rem;
+      color: #1a202c;
+    }
+
+    .data-table {
+      width: 100%;
+      background: white;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .data-table thead {
+      background: #f1f5f9;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .data-table th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    .data-table td {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-buttons button {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .modal.show {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
     }
 
-    .card {
-      background: #fff;
+    .modal-content {
+      background: white;
+      padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-      padding: 60px 80px;
-      text-align: center;
-      max-width: 480px;
       width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
 
-    h1 {
-      font-size: 2.5rem;
+    .modal-content h2 {
+      margin-bottom: 24px;
       color: #1a202c;
-      margin-bottom: 12px;
     }
 
-    p {
-      font-size: 1.1rem;
-      color: #718096;
+    .close {
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #94a3b8;
+    }
+
+    .close:hover {
+      color: #334155;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    input, select, textarea {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-present {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-absent {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filters input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-left: 4px solid #2563eb;
+    }
+
+    .stat-card h3 {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 60px;
+      }
+
+      .logo {
+        display: none;
+      }
+
+      .nav-menu {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+      }
+
+      .nav-menu li {
+        margin: 0;
+        min-width: 120px;
+      }
+
+      .data-table {
+        font-size: 0.85rem;
+      }
+
+      .data-table th, .data-table td {
+        padding: 12px 8px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Hello, World!</h1>
-    <p>Welcome to Simple HTML</p>
+  <div class="container">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="logo">
+        <h2>📊 HRMS</h2>
+        <p>Mantralaya</p>
+      </div>
+
+      <ul class="nav-menu">
+        <li><button class="nav-link active" onclick="switchPage('dashboard')">🏠 Dashboard</button></li>
+        <li><button class="nav-link" onclick="switchPage('employees')">👥 Employees</button></li>
+        <li><button class="nav-link" onclick="switchPage('attendance')">📋 Attendance</button></li>
+        <li><button class="nav-link" onclick="switchPage('leaves')">🏖️ Leaves</button></li>
+        <li><button class="nav-link" onclick="switchPage('salary')">💰 Salary</button></li>
+        <li><button class="nav-link" onclick="switchPage('promotions')">⭐ Promotions</button></li>
+        <li><button class="nav-link" onclick="switchPage('transfers')">🔄 Transfers</button></li>
+        <li><button class="nav-link" onclick="switchPage('postings')">📌 Postings</button></li>
+        <li><button class="nav-link" onclick="switchPage('settings')">⚙️ Settings</button></li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="top-bar">
+        <h1 id="page-title">Dashboard</h1>
+        <div class="export-buttons">
+          <button class="btn btn-warning" onclick="exportJSON()">📥 Export JSON</button>
+          <button class="btn btn-success" onclick="exportExcel()">📊 Export Excel</button>
+          <button class="btn btn-primary" onclick="document.getElementById('jsonUpload').click()">📤 Import JSON</button>
+          <button class="btn btn-primary" onclick="document.getElementById('excelUpload').click()">📤 Import Excel</button>
+          <input type="file" id="jsonUpload" accept=".json" style="display:none;" onchange="importJSON(event)">
+          <input type="file" id="excelUpload" accept=".xlsx,.xls" style="display:none;" onchange="importExcel(event)">
+        </div>
+      </header>
+
+      <div class="content-area">
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="page active">
+          <h2>Dashboard</h2>
+          <div class="stats">
+            <div class="stat-card">
+              <h3>Total Employees</h3>
+              <p class="stat-number" id="stat-employees">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Total Attendance Records</h3>
+              <p class="stat-number" id="stat-attendance">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Leave Requests</h3>
+              <p class="stat-number" id="stat-leaves">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Salary Records</h3>
+              <p class="stat-number" id="stat-salary">0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMPLOYEES -->
+        <div id="employees" class="page">
+          <div class="page-header">
+            <h2>Employee Management</h2>
+            <button class="btn btn-primary" onclick="openEmpModal()">+ Add Employee</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Salary</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="emp-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ATTENDANCE -->
+        <div id="attendance" class="page">
+          <div class="page-header">
+            <h2>Attendance Management</h2>
+            <button class="btn btn-primary" onclick="openAttModal()">+ Mark Attendance</button>
+          </div>
+          <div class="filters">
+            <input type="text" id="att-filter" placeholder="Search Employee ID">
+            <button class="btn btn-secondary" onclick="loadAttendance()">Filter</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="att-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- LEAVES -->
+        <div id="leaves" class="page">
+          <div class="page-header">
+            <h2>Leave Management</h2>
+            <button class="btn btn-primary" onclick="openLeaveModal()">+ Request Leave</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leave-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SALARY -->
+        <div id="salary" class="page">
+          <div class="page-header">
+            <h2>Salary Management</h2>
+            <button class="btn btn-primary" onclick="openSalaryModal()">+ Add Salary</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Month</th>
+                <th>Basic</th>
+                <th>Allowances</th>
+                <th>Deductions</th>
+                <th>Net</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sal-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PROMOTIONS -->
+        <div id="promotions" class="page">
+          <div class="page-header">
+            <h2>Promotion Management</h2>
+            <button class="btn btn-primary" onclick="openPromoModal()">+ Add Promotion</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Old Designation</th>
+                <th>New Designation</th>
+                <th>Old Salary</th>
+                <th>New Salary</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="promo-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TRANSFERS -->
+        <div id="transfers" class="page">
+          <div class="page-header">
+            <h2>Transfer Management</h2>
+            <button class="btn btn-primary" onclick="openTransferModal()">+ Add Transfer</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Old Department</th>
+                <th>New Department</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="trans-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- POSTINGS -->
+        <div id="postings" class="page">
+          <div class="page-header">
+            <h2>Posting Management</h2>
+            <button class="btn btn-primary" onclick="openPostingModal()">+ Add Posting</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Location</th>
+                <th>Designation</th>
+                <th>Department</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="post-list">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="settings" class="page">
+          <div class="page-header">
+            <h2>Settings & Data Management</h2>
+          </div>
+          <div style="background: white; padding: 24px; border-radius: 8px; max-width: 600px;">
+            <h3 style="margin-bottom: 20px;">Data Management</h3>
+
+            <div style="margin-bottom: 20px;">
+              <button class="btn btn-warning" onclick="exportJSON()" style="width: 100%; margin-bottom: 10px;">📥 Export All Data as JSON</button>
+              <p style="color: #64748b; font-size: 0.9rem;">Download all HRMS data in JSON format</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <button class="btn btn-success" onclick="exportExcel()" style="width: 100%; margin-bottom: 10px;">📊 Export All Data as Excel</button>
+              <p style="color: #64748b; font-size: 0.9rem;">Download all HRMS data as Excel sheets</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <button class="btn btn-primary" onclick="document.getElementById('jsonUpload2').click()" style="width: 100%; margin-bottom: 10px;">📤 Import JSON Data</button>
+              <p style="color: #64748b; font-size: 0.9rem;">Import previously exported JSON file</p>
+              <input type="file" id="jsonUpload2" accept=".json" style="display:none;" onchange="importJSON(event)">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <button class="btn btn-primary" onclick="document.getElementById('excelUpload2').click()" style="width: 100%; margin-bottom: 10px;">📤 Import Excel Data</button>
+              <p style="color: #64748b; font-size: 0.9rem;">Import data from Excel file</p>
+              <input type="file" id="excelUpload2" accept=".xlsx,.xls" style="display:none;" onchange="importExcel(event)">
+            </div>
+
+            <div style="margin-bottom: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <button class="btn btn-danger" onclick="clearAllData()" style="width: 100%;">🗑️ Clear All Data</button>
+              <p style="color: #64748b; font-size: 0.9rem; margin-top: 10px;">⚠️ This will delete all data permanently!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- MODALS -->
+  <!-- Employee Modal -->
+  <div id="emp-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('emp-modal')">&times;</span>
+      <h2>Add Employee</h2>
+      <form onsubmit="saveEmployee(event)">
+        <input type="text" id="emp-empId" placeholder="Employee ID" required>
+        <input type="text" id="emp-name" placeholder="Full Name" required>
+        <input type="email" id="emp-email" placeholder="Email" required>
+        <input type="text" id="emp-phone" placeholder="Phone">
+        <input type="text" id="emp-department" placeholder="Department" required>
+        <input type="text" id="emp-designation" placeholder="Designation" required>
+        <input type="number" id="emp-salary" placeholder="Salary" required>
+        <input type="date" id="emp-doj" required>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Attendance Modal -->
+  <div id="att-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('att-modal')">&times;</span>
+      <h2>Mark Attendance</h2>
+      <form onsubmit="saveAttendance(event)">
+        <input type="text" id="att-empId" placeholder="Employee ID" required>
+        <input type="date" id="att-date" required>
+        <select id="att-status" required>
+          <option value="">Select Status</option>
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+          <option value="Leave">Leave</option>
+          <option value="WFH">WFH</option>
+        </select>
+        <input type="time" id="att-checkin" placeholder="Check In">
+        <input type="time" id="att-checkout" placeholder="Check Out">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Leave Modal -->
+  <div id="leave-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('leave-modal')">&times;</span>
+      <h2>Request Leave</h2>
+      <form onsubmit="saveLeave(event)">
+        <input type="text" id="leave-empId" placeholder="Employee ID" required>
+        <select id="leave-type" required>
+          <option value="">Select Type</option>
+          <option value="Sick">Sick Leave</option>
+          <option value="Casual">Casual Leave</option>
+          <option value="Annual">Annual Leave</option>
+          <option value="Maternity">Maternity Leave</option>
+        </select>
+        <input type="date" id="leave-start" required>
+        <input type="date" id="leave-end" required>
+        <input type="number" id="leave-days" placeholder="Days" required>
+        <textarea id="leave-reason" placeholder="Reason" required></textarea>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Salary Modal -->
+  <div id="sal-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('sal-modal')">&times;</span>
+      <h2>Add Salary</h2>
+      <form onsubmit="saveSalary(event)">
+        <input type="text" id="sal-empId" placeholder="Employee ID" required>
+        <input type="month" id="sal-month" required>
+        <input type="number" id="sal-basic" placeholder="Basic Salary" required>
+        <input type="number" id="sal-allowances" placeholder="Allowances" required>
+        <input type="number" id="sal-deductions" placeholder="Deductions" required>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Promotion Modal -->
+  <div id="promo-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('promo-modal')">&times;</span>
+      <h2>Add Promotion</h2>
+      <form onsubmit="savePromotion(event)">
+        <input type="text" id="promo-empId" placeholder="Employee ID" required>
+        <input type="text" id="promo-oldDesig" placeholder="Old Designation" required>
+        <input type="text" id="promo-newDesig" placeholder="New Designation" required>
+        <input type="number" id="promo-oldSal" placeholder="Old Salary" required>
+        <input type="number" id="promo-newSal" placeholder="New Salary" required>
+        <input type="date" id="promo-date" required>
+        <textarea id="promo-reason" placeholder="Reason" required></textarea>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Transfer Modal -->
+  <div id="trans-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('trans-modal')">&times;</span>
+      <h2>Add Transfer</h2>
+      <form onsubmit="saveTransfer(event)">
+        <input type="text" id="trans-empId" placeholder="Employee ID" required>
+        <input type="text" id="trans-oldDept" placeholder="Old Department" required>
+        <input type="text" id="trans-newDept" placeholder="New Department" required>
+        <input type="date" id="trans-date" required>
+        <textarea id="trans-reason" placeholder="Reason" required></textarea>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Posting Modal -->
+  <div id="post-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('post-modal')">&times;</span>
+      <h2>Add Posting</h2>
+      <form onsubmit="savePosting(event)">
+        <input type="text" id="post-empId" placeholder="Employee ID" required>
+        <input type="text" id="post-location" placeholder="Location" required>
+        <input type="text" id="post-desig" placeholder="Designation" required>
+        <input type="text" id="post-dept" placeholder="Department" required>
+        <input type="date" id="post-start" required>
+        <input type="date" id="post-end" placeholder="End Date (optional)">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // DATA STRUCTURE
+    let data = {
+      employees: [],
+      attendance: [],
+      leaves: [],
+      salaries: [],
+      promotions: [],
+      transfers: [],
+      postings: []
+    };
+
+    // LOAD DATA FROM LOCALSTORAGE
+    function loadData() {
+      const saved = localStorage.getItem('hrmsData');
+      if (saved) {
+        data = JSON.parse(saved);
+      }
+      refreshAllPages();
+    }
+
+    // SAVE DATA TO LOCALSTORAGE
+    function saveData() {
+      localStorage.setItem('hrmsData', JSON.stringify(data));
+      refreshAllPages();
+    }
+
+    // PAGE SWITCHING
+    function switchPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+      document.getElementById(page).classList.add('active');
+      event.target.classList.add('active');
+
+      const titles = {
+        dashboard: 'Dashboard',
+        employees: 'Employee Management',
+        attendance: 'Attendance',
+        leaves: 'Leaves',
+        salary: 'Salary',
+        promotions: 'Promotions',
+        transfers: 'Transfers',
+        postings: 'Postings',
+        settings: 'Settings'
+      };
+
+      document.getElementById('page-title').textContent = titles[page];
+    }
+
+    // MODAL FUNCTIONS
+    function openEmpModal() { document.getElementById('emp-modal').classList.add('show'); }
+    function openAttModal() { document.getElementById('att-modal').classList.add('show'); }
+    function openLeaveModal() { document.getElementById('leave-modal').classList.add('show'); }
+    function openSalaryModal() { document.getElementById('sal-modal').classList.add('show'); }
+    function openPromoModal() { document.getElementById('promo-modal').classList.add('show'); }
+    function openTransferModal() { document.getElementById('trans-modal').classList.add('show'); }
+    function openPostingModal() { document.getElementById('post-modal').classList.add('show'); }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('show');
+      }
+    }
+
+    // SAVE FUNCTIONS
+    function saveEmployee(e) {
+      e.preventDefault();
+      const emp = {
+        id: Date.now(),
+        empId: document.getElementById('emp-empId').value,
+        name: document.getElementById('emp-name').value,
+        email: document.getElementById('emp-email').value,
+        phone: document.getElementById('emp-phone').value,
+        department: document.getElementById('emp-department').value,
+        designation: document.getElementById('emp-designation').value,
+        salary: parseFloat(document.getElementById('emp-salary').value),
+        doj: document.getElementById('emp-doj').value
+      };
+      data.employees.push(emp);
+      saveData();
+      closeModal('emp-modal');
+      document.getElementById('emp-modal').querySelector('form').reset();
+    }
+
+    function saveAttendance(e) {
+      e.preventDefault();
+      const att = {
+        id: Date.now(),
+        empId: document.getElementById('att-empId').value,
+        date: document.getElementById('att-date').value,
+        status: document.getElementById('att-status').value,
+        checkin: document.getElementById('att-checkin').value,
+        checkout: document.getElementById('att-checkout').value
+      };
+      data.attendance.push(att);
+      saveData();
+      closeModal('att-modal');
+      document.getElementById('att-modal').querySelector('form').reset();
+    }
+
+    function saveLeave(e) {
+      e.preventDefault();
+      const leave = {
+        id: Date.now(),
+        empId: document.getElementById('leave-empId').value,
+        type: document.getElementById('leave-type').value,
+        start: document.getElementById('leave-start').value,
+        end: document.getElementById('leave-end').value,
+        days: parseInt(document.getElementById('leave-days').value),
+        reason: document.getElementById('leave-reason').value,
+        status: 'Pending'
+      };
+      data.leaves.push(leave);
+      saveData();
+      closeModal('leave-modal');
+      document.getElementById('leave-modal').querySelector('form').reset();
+    }
+
+    function saveSalary(e) {
+      e.preventDefault();
+      const basic = parseFloat(document.getElementById('sal-basic').value);
+      const allowances = parseFloat(document.getElementById('sal-allowances').value);
+      const deductions = parseFloat(document.getElementById('sal-deductions').value);
+
+      const sal = {
+        id: Date.now(),
+        empId: document.getElementById('sal-empId').value,
+        month: document.getElementById('sal-month').value,
+        basic: basic,
+        allowances: allowances,
+        deductions: deductions,
+        net: basic + allowances - deductions
+      };
+      data.salaries.push(sal);
+      saveData();
+      closeModal('sal-modal');
+      document.getElementById('sal-modal').querySelector('form').reset();
+    }
+
+    function savePromotion(e) {
+      e.preventDefault();
+      const promo = {
+        id: Date.now(),
+        empId: document.getElementById('promo-empId').value,
+        oldDesig: document.getElementById('promo-oldDesig').value,
+        newDesig: document.getElementById('promo-newDesig').value,
+        oldSal: parseFloat(document.getElementById('promo-oldSal').value),
+        newSal: parseFloat(document.getElementById('promo-newSal').value),
+        date: document.getElementById('promo-date').value,
+        reason: document.getElementById('promo-reason').value,
+        status: 'Pending'
+      };
+      data.promotions.push(promo);
+      saveData();
+      closeModal('promo-modal');
+      document.getElementById('promo-modal').querySelector('form').reset();
+    }
+
+    function saveTransfer(e) {
+      e.preventDefault();
+      const trans = {
+        id: Date.now(),
+        empId: document.getElementById('trans-empId').value,
+        oldDept: document.getElementById('trans-oldDept').value,
+        newDept: document.getElementById('trans-newDept').value,
+        date: document.getElementById('trans-date').value,
+        reason: document.getElementById('trans-reason').value,
+        status: 'Pending'
+      };
+      data.transfers.push(trans);
+      saveData();
+      closeModal('trans-modal');
+      document.getElementById('trans-modal').querySelector('form').reset();
+    }
+
+    function savePosting(e) {
+      e.preventDefault();
+      const post = {
+        id: Date.now(),
+        empId: document.getElementById('post-empId').value,
+        location: document.getElementById('post-location').value,
+        desig: document.getElementById('post-desig').value,
+        dept: document.getElementById('post-dept').value,
+        start: document.getElementById('post-start').value,
+        end: document.getElementById('post-end').value,
+        status: 'Active'
+      };
+      data.postings.push(post);
+      saveData();
+      closeModal('post-modal');
+      document.getElementById('post-modal').querySelector('form').reset();
+    }
+
+    // DELETE FUNCTIONS
+    function deleteRecord(type, id) {
+      if (!confirm('Delete this record?')) return;
+      data[type] = data[type].filter(item => item.id !== id);
+      saveData();
+    }
+
+    // LOAD/DISPLAY FUNCTIONS
+    function loadEmployees() {
+      const tbody = document.getElementById('emp-list');
+      tbody.innerHTML = data.employees.map(emp => `
+        <tr>
+          <td>${emp.empId}</td>
+          <td>${emp.name}</td>
+          <td>${emp.email}</td>
+          <td>${emp.department}</td>
+          <td>${emp.designation}</td>
+          <td>₹${emp.salary.toLocaleString('en-IN')}</td>
+          <td><button class="btn btn-danger" onclick="deleteRecord('employees', ${emp.id})">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function loadAttendance() {
+      const filter = document.getElementById('att-filter')?.value || '';
+      const tbody = document.getElementById('att-list');
+      const filtered = filter ? data.attendance.filter(a => a.empId.includes(filter)) : data.attendance;
+
+      tbody.innerHTML = filtered.map(att => `
+        <tr>
+          <td>${att.empId}</td>
+          <td>${att.date}</td>
+          <td><span class="status-badge status-${att.status.toLowerCase()}">${att.status}</span></td>
+          <td>${att.checkin || '-'}</td>
+          <td>${att.checkout || '-'}</td>
+          <td><button class="btn btn-danger" onclick="deleteRecord('attendance', ${att.id})">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function loadLeaves() {
+      const tbody = document.getElementById('leave-list');
+      tbody.innerHTML = data.leaves.map(leave => `
+        <tr>
+          <td>${leave.empId}</td>
+          <td>${leave.type}</td>
+          <td>${leave.start}</td>
+          <td>${leave.end}</td>
+          <td>${leave.days}</td>
+          <td><span class="status-badge status-${leave.status.toLowerCase()}">${leave.status}</span></td>
+          <td>
+            ${leave.status === 'Pending' ? `
+              <button class="btn btn-success" onclick="approveLeave(${leave.id})">✓</button>
+              <button class="btn btn-danger" onclick="rejectLeave(${leave.id})">✗</button>
+            ` : `<button class="btn btn-danger" onclick="deleteRecord('leaves', ${leave.id})">Delete</button>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function approveLeave(id) {
+      const leave = data.leaves.find(l => l.id === id);
+      if (leave) {
+        leave.status = 'Approved';
+        saveData();
+      }
+    }
+
+    function rejectLeave(id) {
+      const leave = data.leaves.find(l => l.id === id);
+      if (leave) {
+        leave.status = 'Rejected';
+        saveData();
+      }
+    }
+
+    function loadSalaries() {
+      const tbody = document.getElementById('sal-list');
+      tbody.innerHTML = data.salaries.map(sal => `
+        <tr>
+          <td>${sal.empId}</td>
+          <td>${sal.month}</td>
+          <td>₹${sal.basic.toLocaleString('en-IN')}</td>
+          <td>₹${sal.allowances.toLocaleString('en-IN')}</td>
+          <td>₹${sal.deductions.toLocaleString('en-IN')}</td>
+          <td>₹${sal.net.toLocaleString('en-IN')}</td>
+          <td><button class="btn btn-danger" onclick="deleteRecord('salaries', ${sal.id})">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function loadPromotions() {
+      const tbody = document.getElementById('promo-list');
+      tbody.innerHTML = data.promotions.map(promo => `
+        <tr>
+          <td>${promo.empId}</td>
+          <td>${promo.oldDesig}</td>
+          <td>${promo.newDesig}</td>
+          <td>₹${promo.oldSal.toLocaleString('en-IN')}</td>
+          <td>₹${promo.newSal.toLocaleString('en-IN')}</td>
+          <td>${promo.date}</td>
+          <td><span class="status-badge status-${promo.status.toLowerCase()}">${promo.status}</span></td>
+          <td>
+            ${promo.status === 'Pending' ? `
+              <button class="btn btn-success" onclick="approvePromo(${promo.id})">✓</button>
+              <button class="btn btn-danger" onclick="deleteRecord('promotions', ${promo.id})">Delete</button>
+            ` : `<button class="btn btn-danger" onclick="deleteRecord('promotions', ${promo.id})">Delete</button>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function approvePromo(id) {
+      const promo = data.promotions.find(p => p.id === id);
+      if (promo) {
+        promo.status = 'Approved';
+        saveData();
+      }
+    }
+
+    function loadTransfers() {
+      const tbody = document.getElementById('trans-list');
+      tbody.innerHTML = data.transfers.map(trans => `
+        <tr>
+          <td>${trans.empId}</td>
+          <td>${trans.oldDept}</td>
+          <td>${trans.newDept}</td>
+          <td>${trans.date}</td>
+          <td><span class="status-badge status-${trans.status.toLowerCase()}">${trans.status}</span></td>
+          <td>
+            ${trans.status === 'Pending' ? `
+              <button class="btn btn-success" onclick="approveTrans(${trans.id})">✓</button>
+              <button class="btn btn-danger" onclick="deleteRecord('transfers', ${trans.id})">Delete</button>
+            ` : `<button class="btn btn-danger" onclick="deleteRecord('transfers', ${trans.id})">Delete</button>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function approveTrans(id) {
+      const trans = data.transfers.find(t => t.id === id);
+      if (trans) {
+        trans.status = 'Approved';
+        saveData();
+      }
+    }
+
+    function loadPostings() {
+      const tbody = document.getElementById('post-list');
+      tbody.innerHTML = data.postings.map(post => `
+        <tr>
+          <td>${post.empId}</td>
+          <td>${post.location}</td>
+          <td>${post.desig}</td>
+          <td>${post.dept}</td>
+          <td>${post.start}</td>
+          <td>${post.end || '-'}</td>
+          <td><button class="btn btn-danger" onclick="deleteRecord('postings', ${post.id})">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function updateDashboard() {
+      document.getElementById('stat-employees').textContent = data.employees.length;
+      document.getElementById('stat-attendance').textContent = data.attendance.length;
+      document.getElementById('stat-leaves').textContent = data.leaves.length;
+      document.getElementById('stat-salary').textContent = data.salaries.length;
+    }
+
+    function refreshAllPages() {
+      loadEmployees();
+      loadAttendance();
+      loadLeaves();
+      loadSalaries();
+      loadPromotions();
+      loadTransfers();
+      loadPostings();
+      updateDashboard();
+    }
+
+    // EXPORT FUNCTIONS
+    function exportJSON() {
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hrms-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+    }
+
+    function exportExcel() {
+      const wb = XLSX.utils.book_new();
+
+      // Add sheets
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.employees), 'Employees');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.attendance), 'Attendance');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.leaves), 'Leaves');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.salaries), 'Salaries');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.promotions), 'Promotions');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.transfers), 'Transfers');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.postings), 'Postings');
+
+      XLSX.writeFile(wb, `hrms-backup-${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    // IMPORT FUNCTIONS
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          data = imported;
+          saveData();
+          alert('Data imported successfully!');
+        } catch (error) {
+          alert('Error importing JSON: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function importExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'binary' });
+          const imported = {
+            employees: XLSX.utils.sheet_to_json(wb.Sheets['Employees'] || []),
+            attendance: XLSX.utils.sheet_to_json(wb.Sheets['Attendance'] || []),
+            leaves: XLSX.utils.sheet_to_json(wb.Sheets['Leaves'] || []),
+            salaries: XLSX.utils.sheet_to_json(wb.Sheets['Salaries'] || []),
+            promotions: XLSX.utils.sheet_to_json(wb.Sheets['Promotions'] || []),
+            transfers: XLSX.utils.sheet_to_json(wb.Sheets['Transfers'] || []),
+            postings: XLSX.utils.sheet_to_json(wb.Sheets['Postings'] || [])
+          };
+          data = imported;
+          saveData();
+          alert('Data imported successfully!');
+        } catch (error) {
+          alert('Error importing Excel: ' + error.message);
+        }
+      };
+      reader.readAsBinaryString(file);
+    }
+
+    function clearAllData() {
+      if (confirm('⚠️ This will delete ALL data! Are you sure?')) {
+        if (confirm('This action cannot be undone! Confirm again?')) {
+          data = { employees: [], attendance: [], leaves: [], salaries: [], promotions: [], transfers: [], postings: [] };
+          saveData();
+          alert('All data has been cleared!');
+        }
+      }
+    }
+
+    // INITIALIZE
+    loadData();
+  </script>
 </body>
 </html>
